@@ -445,6 +445,9 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+@app.get("/")
+async def root():
+    return {"status": "online", "message": "Happypup API Backend is running successfully!"}
 
 # Accepts either a single image (for upload mode) or multiple images (for camera mode)
 @app.post("/predict")
