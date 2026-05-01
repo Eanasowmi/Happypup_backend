@@ -1,0 +1,35 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases
+users.db
+*.sqlite3
+
+# Temporary files and uploads
+temp_*
+*.jpeg
+*.jpg
+*.png
+calibration_results.csv
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Ignore old datasets / calibration images (optional, depends if you want them versioned)
+# data/
+# calibration_images/
