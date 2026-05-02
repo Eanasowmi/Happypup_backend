@@ -226,7 +226,18 @@ class DogProfile(BaseModel):
     weight: Optional[float] = 0.0
     last_skin_disease: Optional[str] = None
     last_emotion: Optional[str] = None
-    created_at: str
+    created_at: Optional[str] = None
+
+class DogProfileUpdate(BaseModel):
+    user_id: Optional[int] = None
+    name: Optional[str] = None
+    breed: Optional[str] = None
+    age: Optional[int] = None
+    age_range: Optional[str] = None
+    weight: Optional[float] = None
+    last_skin_disease: Optional[str] = None
+    last_emotion: Optional[str] = None
+    created_at: Optional[str] = None
 
 # BCS model setup
 BCS_NUM_CLASSES = 3
@@ -843,15 +854,22 @@ async def get_dogs(user_id: int):
     return results
 
 @app.put("/dogs/{dog_id}")
-async def update_dog(dog_id: int, dog: DogProfile):
+async def update_dog(dog_id: int, dog: DogProfileUpdate):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     try:
-        cursor.execute('''
-            UPDATE dogs SET name=?, breed=?, age=?, age_range=?, weight=?, 
-            last_skin_disease=?, last_emotion=? WHERE id=?
-        ''', (dog.name, dog.breed, dog.age, dog.age_range, dog.weight, 
-              dog.last_skin_disease, dog.last_emotion, dog_id))
+        # Extract only the fields that were provided in the request
+        update_data = dog.dict(exclude_unset=True)
+        if not update_data:
+            return {"message": "Nothing to update"}
+            
+        # Ensure we don't accidentally try to update the primary key if passed
+        update_data.pop("id", None)
+            
+        set_clause = ", ".join([f"{k}=?" for k in update_data.keys()])
+        values = list(update_data.values()) + [dog_id]
+        
+        cursor.execute(f"UPDATE dogs SET {set_clause} WHERE id=?", values)
         conn.commit()
         return {"message": "Dog updated successfully"}
     except Exception as e:
